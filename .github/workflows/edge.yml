@@ -26,13 +26,13 @@ jobs:
       run: |
         sudo apt install jq -y
         sudo apt install moreutils -y
-    - name: Check latest version
-      run: |
-        ./.github/scripts/version.sh
-        echo "BUILD=$(cat build)" >> $GITHUB_ENV
-        echo "LATEST_VERSION=$(cat latest_version)" >> $GITHUB_ENV
-        echo "CURRENT_VERSION=$(cat current_version)" >> $GITHUB_ENV
-      id: version-check
+    # - name: Check latest version
+    #   run: |
+    #     ./.github/scripts/version.sh
+    #     echo "BUILD=$(cat build)" >> $GITHUB_ENV
+    #     echo "LATEST_VERSION=$(cat latest_version)" >> $GITHUB_ENV
+    #     echo "CURRENT_VERSION=$(cat current_version)" >> $GITHUB_ENV
+    #   id: version-check
     - name: Already latest version - cancelling
       if: env.BUILD == 'false'
       uses: andymckay/cancel-action@0.2
