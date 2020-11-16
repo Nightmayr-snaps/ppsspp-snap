@@ -1,0 +1,239 @@
+name: ppsspp-emu
+base: core20
+adopt-info: ppsspp
+summary: A PlayStation Portable Emulator
+description: |
+  PPSSPP is a PSP emulator that can run games at full HD resolution. 
+  It can even upscale textures that would otherwise be too blurry as they were made for the small screen of the original PSP.
+
+license: GPL-2.0+
+icon: snap/gui/ppsspp.png
+grade: stable
+confinement: strict
+architectures:
+  - build-on: amd64
+compression: lzo
+
+parts:
+  ppsspp:
+    source: https://github.com/hrydgard/ppsspp.git
+    plugin: cmake
+    cmake-parameters: 
+    - -DCMAKE_BUILD_TYPE=Release
+    override-pull: |
+      snapcraftctl pull
+      snapcraftctl set-version "$(git describe --tags $(git rev-list --tags --max-count=1) | tr -d "v")"
+      git checkout "$(git describe --tags $(git rev-list --tags --max-count=1))"
+    override-build: |
+      snapcraftctl build
+      mkdir -p $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp $SNAPCRAFT_PART_INSTALL/usr/local/bin $SNAPCRAFT_PART_INSTALL/usr/local/share/applications
+      install -D -m755 $SNAPCRAFT_PART_BUILD/PPSSPPSDL $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp/PPSSPPSDL
+      cp -dr $SNAPCRAFT_PART_BUILD/assets $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp/
+      install -Dm644 $SNAPCRAFT_PART_BUILD/icons/icon-512.svg $SNAPCRAFT_PART_INSTALL/usr/local/share/icons/hicolor/scalable/apps/ppsspp.svg
+      # ln -s $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp/PPSSPPSDL $SNAPCRAFT_PART_INSTALL/usr/local/bin/ppsspp-sdl
+      # sed -i 's|/usr/share/icons/hicolor/114x114/apps/icon-114.png|Icon=/usr/local/share/icons/hicolor/scalable/apps/icon.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/PPSSPP.desktop
+    build-packages:
+      - build-essential
+      - cmake
+      - libgl1-mesa-dev
+      - libsdl2-dev
+      - libvulkan-dev
+      - libzip-dev
+    stage-packages:
+      - libsdl2-2.0-0
+      - qt5-gtk-platformtheme
+      - libvulkan1
+      - mesa-vulkan-drivers
+      - libgl1-mesa-glx
+      - mesa-utils
+      - libpulse0
+    stage:
+    - -usr/share/doc
+  launchers:
+    plugin: dump
+    source: snap/local/launchers
+    source-type: local
+    organize:
+      '*': bin/
+  desktop-files:
+    plugin: dump
+    source: snap/local
+    source-type: local
+    organize:
+      '*.desktop': usr/local/share/applications/
+    override-build: |
+      snapcraftctl build
+      sed -i 's|Icon=ppsspp|Icon=/usr/local/share/icons/hicolor/scalable/apps/ppsspp.svg|' $SNAPCRAFT_PART_INSTALL/ppsspp.desktop
+    stage:
+    - -launchers
+    after:
+      - ppsspp
+  # ppsspp-qt:
+  #   source: https://github.com/hrydgard/ppsspp.git
+  #   plugin: cmake
+  #   cmake-parameters: 
+  #   - -DCMAKE_BUILD_TYPE=Release
+  #   - -DUSING_QT_UI=ON
+  #   override-pull: |
+  #     snapcraftctl pull
+  #     snapcraftctl set-version "$(git describe --tags | tr -d "v")"
+  #     git checkout "$(git describe --tags)"
+  #   override-build: |
+  #     snapcraftctl build
+  #     mkdir -p $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp $SNAPCRAFT_PART_INSTALL/usr/local/bin
+  #     install -D -m755 $SNAPCRAFT_PART_BUILD/PPSSPPQt $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp/PPSSPPQt
+  #     # cp -dr $SNAPCRAFT_PART_BUILD/assets $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp/
+  #     # sed -i 's|/usr/share/icons/hicolor/114x114/apps/icon-114.png|Icon=/usr/local/share/icons/hicolor/scalable/apps/icon.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/PPSSPP.desktop
+  #   build-packages:
+  #     - build-essential
+  #     - cmake
+  #     - libgl1-mesa-dev
+  #     - libsdl2-dev
+  #     - libvulkan-dev
+  #     - qt5-qmake
+  #     - qtbase5-dev
+  #     - qtmultimedia5-dev
+  #     - qttools5-dev-tools
+  #     - qtdeclarative5-dev
+  #     - libqt5webkit5-dev
+  #     - libqt5opengl5-dev
+  #     - libsqlite3-dev
+  #     - qt5-default
+  #   stage-packages:
+  #     - libsdl2-2.0-0
+  #     - qt5-gtk-platformtheme
+  #     - libvulkan1
+  #     - mesa-vulkan-drivers
+  #     - libgl1-mesa-glx
+  #     - mesa-utils
+  #     - libpulse0
+  #     - libqt5multimedia5
+  #     - libqt5opengl5
+  #   stage:
+  #   - -usr/share/doc
+  #   after:
+  #   - desktop-qt5
+  #   - ppsspp
+  desktop-qt5:
+    build-packages:
+    - build-essential
+    - qtbase5-dev
+    - dpkg-dev
+    make-parameters:
+    - FLAVOR=qt5
+    plugin: make
+    source: https://github.com/ubuntu/snapcraft-desktop-helpers.git
+    source-subdir: qt
+    stage-packages:
+    - libxkbcommon0
+    - ttf-ubuntu-font-family
+    - dmz-cursor-theme
+    - light-themes
+    - adwaita-icon-theme
+    - gnome-themes-standard
+    - shared-mime-info
+    # - libqt5gui5
+    - libgtk2.0-0
+    - libgdk-pixbuf2.0-0
+    # - libqt5svg5
+    - libgpm2
+    - freeglut3
+    - libslang2
+    # - try:
+    #   - appmenu-qt5
+    - locales-all
+    # - qtwayland5
+    - xdg-user-dirs
+    override-prime: |
+      snapcraftctl prime
+      sed -i 's|XDG_DATA_HOME=$SNAP_USER_DATA|XDG_DATA_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+      sed -i 's|XDG_CONFIG_HOME=$SNAP_USER_DATA|XDG_CONFIG_HOME=$SNAP_USER_COMMON|' $SNAPCRAFT_PRIME/bin/desktop-launch
+    stage:
+      - -usr/share/doc
+  # plasma-integration:
+  #   plugin: nil
+  #   stage-packages:
+  #   - breeze-icon-theme
+  #   - kde-style-breeze
+  #   - plasma-integration
+  #   stage:
+  #   - -usr/share/doc
+
+plugs:
+  gtk-3-themes:
+    interface: content
+    target: $SNAP/data-dir/themes
+    default-provider: gtk-common-themes
+  icon-themes:
+    interface: content
+    target: $SNAP/data-dir/icons
+    default-provider: gtk-common-themes
+  sound-themes:
+    interface: content
+    target: $SNAP/data-dir/sounds
+    default-provider: gtk-common-themes
+
+apps:
+  ppsspp-sdl:
+    # command: usr/local/bin/ppsspp-sdl
+    command: usr/local/ppsspp/PPSSPPSDL
+    command-chain:
+    - "bin/desktop-launch"
+    - "bin/vulkan-icd-files"
+    desktop: usr/local/share/applications/ppsspp.desktop
+    environment:
+      HOME: "$SNAP_USER_COMMON"
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      KDE_FORK_SLAVES: 1
+      DISABLE_WAYLAND: 1
+      PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
+    plugs:
+    - desktop
+    - desktop-legacy
+    - x11
+    - wayland
+    - audio-playback
+    - audio-record
+    - opengl
+    - joystick
+    - unity7
+    - network
+    - network-bind
+    - home
+    - removable-media
+    - gsettings
+    - hardware-observe
+    - mount-observe
+    - bluez
+    - screen-inhibit-control
+  # ppsspp-qt:
+  #   # command: usr/local/bin/ppsspp-sdl
+  #   command: usr/local/ppsspp/PPSSPPQt
+  #   command-chain:
+  #   - "bin/desktop-launch"
+  #   # desktop: usr/local/share/applications/PPSSPP.desktop
+  #   environment:
+  #     HOME: "$SNAP_USER_COMMON"
+  #     LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+  #     KDE_FORK_SLAVES: 1
+  #     DISABLE_WAYLAND: 1
+  #     PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
+  #   plugs:
+  #   - desktop
+  #   - desktop-legacy
+  #   - x11
+  #   - wayland
+  #   - audio-playback
+  #   - audio-record
+  #   - opengl
+  #   - joystick
+  #   - unity7
+  #   - network
+  #   - network-bind
+  #   - home
+  #   - removable-media
+  #   - gsettings
+  #   - hardware-observe
+  #   - mount-observe
+  #   - bluez
+  #   - screen-inhibit-control
