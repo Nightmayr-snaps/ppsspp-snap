@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         platform:
-        - amd64
+        # - amd64
         - arm64
     if: "!contains(github.event.head_commit.message, '[ci-skip]')"
     steps:
