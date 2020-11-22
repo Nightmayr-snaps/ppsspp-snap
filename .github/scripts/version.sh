@@ -4,19 +4,16 @@ set -x
 
 snap_name="ppsspp-emu"
 git_repo="hrydgard/ppsspp"
+LATEST_VERSION_TAG="$(curl https://api.github.com/repos/$git_repo/releases/latest -s | jq .tag_name -r)"
+LATEST_VERSION=${LATEST_VERSION_TAG#v}
 
 snap info $snap_name > /dev/null
 if [ "$?" -ne 0 ]; then
-    LATEST_VERSION_TAG="$(curl https://api.github.com/repos/$git_repo/releases/latest -s | jq .tag_name -r)"
-    LATEST_VERSION=${LATEST_VERSION_TAG#v}
     echo "Snap not found in store! Building and publishing for first time"
     echo "BUILD=true" >> $GITHUB_ENV
     echo "LATEST_VERSION=$LATEST_VERSION" >> $GITHUB_ENV
 else
-    # check latest released tagged version
-    LATEST_VERSION_TAG="$(curl https://api.github.com/repos/$git_repo/releases/latest -s | jq .tag_name -r)"
     CURRENT_VERSION_SNAP="$(snap info $snap_name | grep edge | head -n 2 | tail -n 1 | awk -F ' ' '{print $2}')"
-    LATEST_VERSION=${LATEST_VERSION_TAG#v}
 
     # compare versions
     if [ $CURRENT_VERSION_SNAP != $LATEST_VERSION ]; then
