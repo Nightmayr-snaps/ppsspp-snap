@@ -15,8 +15,9 @@ jobs:
     strategy:
       matrix:
         platform:
-        # - amd64
-        - arm64
+        - amd64
+        # arm64 builds failing to do final linking, commenting for now
+        # - arm64
     if: "!contains(github.event.head_commit.message, '[ci-skip]')"
     steps:
     - uses: actions/checkout@v2
@@ -26,13 +27,10 @@ jobs:
       run: |
         sudo apt install jq -y
         sudo apt install moreutils -y
-    # - name: Check latest version
-    #   run: |
-    #     ./.github/scripts/version.sh
-    #     echo "BUILD=$(cat build)" >> $GITHUB_ENV
-    #     echo "LATEST_VERSION=$(cat latest_version)" >> $GITHUB_ENV
-    #     echo "CURRENT_VERSION=$(cat current_version)" >> $GITHUB_ENV
-    #   id: version-check
+    - name: Check latest version
+      run: |
+        ./.github/scripts/version.sh
+      id: version-check
     - name: Already latest version - cancelling
       if: env.BUILD == 'false'
       uses: andymckay/cancel-action@0.2
@@ -41,6 +39,10 @@ jobs:
       id: snapcraft
       with:
         architecture: ${{ matrix.platform }}
+    - name: Testing snap
+      run: |
+        sudo snap install --dangerous ${{ steps.snapcraft.outputs.snap }}
+        snap run ppsspp-emu.ppsspp-sdl --version
     - uses: snapcore/action-publish@v1
       with:
         store_login: ${{ secrets.STORE_LOGIN }}
