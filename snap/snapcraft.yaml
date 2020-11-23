@@ -173,6 +173,14 @@ plugs:
     interface: content
     target: $SNAP/data-dir/sounds
     default-provider: gtk-common-themes
+    
+layout:
+  /usr/share/vulkan:
+    symlink: $SNAP/usr/share/vulkan
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so:
+    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_intel.so
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so:
+    symlink: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libvulkan_radeon.so
 
 apps:
   ppsspp-sdl:
