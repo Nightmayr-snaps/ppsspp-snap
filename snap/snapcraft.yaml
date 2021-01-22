@@ -184,7 +184,6 @@ layout:
 
 apps:
   ppsspp-sdl:
-    # command: usr/local/bin/ppsspp-sdl
     command: usr/local/ppsspp/PPSSPPSDL
     command-chain:
     - "bin/desktop-launch"
@@ -192,7 +191,7 @@ apps:
     desktop: usr/local/share/applications/ppsspp.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"
-      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
+      LD_LIBRARY_PATH: "$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio"
       KDE_FORK_SLAVES: 1
       DISABLE_WAYLAND: 1
       PATH: "$PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/libexec/kf5"
