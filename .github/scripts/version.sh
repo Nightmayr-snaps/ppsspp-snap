@@ -2,10 +2,14 @@
 
 set -x
 
+git clone https://github.com/hrydgard/ppsspp.git
+
+LATEST_VERSION="$(cd ppsspp && git describe --tags $(git rev-list --tags --max-count=1) | sed 's/^v//')"
+rm -rf ppsspp
 snap_name="ppsspp-emu"
-git_repo="hrydgard/ppsspp"
-LATEST_VERSION_TAG="$(curl https://api.github.com/repos/$git_repo/releases/latest -s | jq .tag_name -r)"
-LATEST_VERSION=${LATEST_VERSION_TAG#v}
+# git_repo="hrydgard/ppsspp"
+# LATEST_VERSION_TAG="$(curl https://api.github.com/repos/$git_repo/releases/latest -s | jq .tag_name -r)"
+# LATEST_VERSION=${LATEST_VERSION_TAG#v}
 
 snap info $snap_name > /dev/null
 if [ "$?" -ne 0 ]; then
