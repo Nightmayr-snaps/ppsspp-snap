@@ -30,7 +30,7 @@ parts:
       mkdir -p $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp $SNAPCRAFT_PART_INSTALL/usr/local/bin $SNAPCRAFT_PART_INSTALL/usr/local/share/applications
       install -D -m755 $SNAPCRAFT_PART_BUILD/PPSSPPSDL $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp/PPSSPPSDL
       cp -dr $SNAPCRAFT_PART_BUILD/assets $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp/
-      install -Dm644 $SNAPCRAFT_PART_BUILD/icons/icon-512.svg $SNAPCRAFT_PART_INSTALL/usr/local/share/icons/hicolor/scalable/apps/ppsspp.svg
+      install -Dm644 $SNAPCRAFT_PART_SRC/icons/icon-512.svg $SNAPCRAFT_PART_INSTALL/usr/local/share/icons/hicolor/scalable/apps/ppsspp.svg
       # ln -s $SNAPCRAFT_PART_INSTALL/usr/local/ppsspp/PPSSPPSDL $SNAPCRAFT_PART_INSTALL/usr/local/bin/ppsspp-sdl
       # sed -i 's|/usr/share/icons/hicolor/114x114/apps/icon-114.png|Icon=/usr/local/share/icons/hicolor/scalable/apps/icon.svg|' $SNAPCRAFT_PART_INSTALL/usr/local/share/applications/PPSSPP.desktop
     build-packages:
