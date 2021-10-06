@@ -48,6 +48,7 @@ parts:
       - libgl1-mesa-glx
       - mesa-utils
       - libpulse0
+      - libopengl0
     stage:
     - -usr/share/doc
   launchers:
