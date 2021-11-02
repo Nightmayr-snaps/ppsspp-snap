@@ -190,7 +190,7 @@ apps:
     command: usr/local/ppsspp/PPSSPPSDL
     command-chain:
     - "bin/desktop-launch"
-    - "bin/vulkan-icd-files"
+    - "bin/ppsspp-launch"
     desktop: usr/local/share/applications/ppsspp.desktop
     environment:
       HOME: "$SNAP_USER_COMMON"
